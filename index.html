@@ -128,7 +128,7 @@ textarea{resize:vertical;min-height:110px;line-height:1.6}
 }
 .result:empty{display:none}
 .hint{font-size:12px;color:var(--muted);line-height:1.6}
-.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin-bottom:20px;flex-wrap:wrap}
 .tab{padding:9px 12px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted)}
 .tab.active{border-bottom-color:var(--accent);color:var(--accent);font-weight:650}
 .tab-panel.hidden{display:none}
@@ -147,10 +147,33 @@ textarea{resize:vertical;min-height:110px;line-height:1.6}
 .footer{margin-top:35px;text-align:center;color:#92958b;font-size:11px}
 .mobile-toggle{display:none}
 hr{border:0;border-top:1px solid var(--line);margin:15px 0}
+
+/* Инженерный калькулятор */
+.calc-display {
+  width: 100%; padding: 15px; font-size: 24px; text-align: right;
+  border: 1px solid #dfe1d9; border-radius: 6px; background: #fff;
+  margin-bottom: 15px; font-family: monospace; overflow-x: auto; white-space: nowrap;
+}
+.calc-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+.calc-btn {
+  padding: 12px 5px; font-size: 16px; border-radius: 6px;
+  border: 1px solid var(--line); background: #fff; font-weight: 550;
+  text-align: center; transition: .1s;
+}
+.calc-btn:hover { background: #f5f6f1; }
+.calc-btn.op { background: var(--accent-light); color: #354b34; border-color: #dce4d7; }
+.calc-btn.op:hover { background: #dfe7da; }
+.calc-btn.eq { background: var(--accent); color: #fff; border-color: var(--accent); }
+.calc-btn.eq:hover { background: #405840; }
+.calc-btn.clear { background: #fdf0ef; color: #a13e34; border-color: #f5dedb; }
+.calc-btn.clear:hover { background: #f8e0de; }
+.calc-btn.fn { background: #f9f9f8; font-size: 14px; }
+
 @media(max-width:900px){
  .sidebar{width:205px}.content{padding:25px 20px}
  .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
  .topbar{padding:0 20px}
+ .calc-grid { grid-template-columns: repeat(4, 1fr); }
 }
 @media(max-width:620px){
  .layout{display:block}
@@ -166,6 +189,8 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
  .intro-mark{display:none}
  h1{font-size:24px}
  .panel{padding:15px}
+ .calc-grid { grid-template-columns: repeat(4, 1fr); gap: 5px; }
+ .calc-btn { padding: 10px 2px; font-size: 14px; }
 }
 </style>
 </head>
@@ -193,7 +218,7 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
 
   <div class="side-bottom">
     МосНейро<br>
-    Учебная версия 1.1
+    Учебная версия 1.2
   </div>
 </aside>
 
@@ -269,30 +294,67 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
 
 <section class="page" id="page-math">
   <h1>Математика</h1>
-  <p class="subtitle">Численные вычисления и повседневные математические задачи.</p>
+  <p class="subtitle">Численные вычисления, конвертация и готовые задачи.</p>
   <div class="tabs">
     <button class="tab active" data-tab="calcTab">Калькулятор</button>
-    <button class="tab" data-tab="convertTab">Конвертер</button>
-    <button class="tab" data-tab="templatesTab">Формулы</button>
+    <button class="tab" data-tab="convertTab">Конвертер величин</button>
+    <button class="tab" data-tab="templatesTab">Готовые формулы</button>
   </div>
 
   <div class="tab-panel panel" id="calcTab">
-    <h2>Калькулятор</h2>
-    <div class="field">
-      <label for="calcInput">Выражение</label>
-      <input id="calcInput" value="2+3*4" placeholder="Например: sqrt(144) + 2^3">
+    <h2>Инженерный калькулятор</h2>
+    <input type="text" id="calcInput" class="calc-display" placeholder="0" readonly>
+    
+    <div class="calc-grid">
+      <!-- Функции -->
+      <button class="calc-btn fn op" onclick="calcInsert('sin(')">sin</button>
+      <button class="calc-btn fn op" onclick="calcInsert('cos(')">cos</button>
+      <button class="calc-btn fn op" onclick="calcInsert('tan(')">tan</button>
+      <button class="calc-btn fn op" onclick="calcInsert('sqrt(')">√</button>
+      <button class="calc-btn fn op" onclick="calcInsert('^')">x^y</button>
+      <button class="calc-btn fn op" onclick="calcInsert('log(')">log</button>
+      
+      <button class="calc-btn fn op" onclick="calcInsert('asin(')">sin⁻¹</button>
+      <button class="calc-btn fn op" onclick="calcInsert('acos(')">cos⁻¹</button>
+      <button class="calc-btn fn op" onclick="calcInsert('atan(')">tan⁻¹</button>
+      <button class="calc-btn fn op" onclick="calcInsert('ln(')">ln</button>
+      <button class="calc-btn fn op" onclick="calcInsert('(')">(</button>
+      <button class="calc-btn fn op" onclick="calcInsert(')')">)</button>
+      
+      <button class="calc-btn fn op" onclick="calcInsert('!')">n!</button>
+      <button class="calc-btn fn op" onclick="calcInsert('pi')">π</button>
+      <button class="calc-btn fn op" onclick="calcInsert('e')">e</button>
+      <button class="calc-btn fn op" onclick="calcInsert('abs(')">|x|</button>
+      <button class="calc-btn clear" onclick="calcClearAll()">C</button>
+      <button class="calc-btn clear" onclick="calcBackspace()">⌫</button>
+      
+      <!-- Цифры и операторы -->
+      <button class="calc-btn" onclick="calcInsert('7')">7</button>
+      <button class="calc-btn" onclick="calcInsert('8')">8</button>
+      <button class="calc-btn" onclick="calcInsert('9')">9</button>
+      <button class="calc-btn op" onclick="calcInsert('/')">÷</button>
+      <button class="calc-btn op" onclick="calcInsert('*')">×</button>
+      <button class="calc-btn op" onclick="calcInsert('-')">−</button>
+      
+      <button class="calc-btn" onclick="calcInsert('4')">4</button>
+      <button class="calc-btn" onclick="calcInsert('5')">5</button>
+      <button class="calc-btn" onclick="calcInsert('6')">6</button>
+      <button class="calc-btn op" onclick="calcInsert('+')">+</button>
+      <button class="calc-btn" onclick="calcInsert('ans')">ans</button>
+      <button class="calc-btn eq" onclick="calculate()" style="grid-row: span 2;">=</button>
+      
+      <button class="calc-btn" onclick="calcInsert('1')">1</button>
+      <button class="calc-btn" onclick="calcInsert('2')">2</button>
+      <button class="calc-btn" onclick="calcInsert('3')">3</button>
+      <button class="calc-btn" onclick="calcInsert('0')">0</button>
+      <button class="calc-btn" onclick="calcInsert('.')">.</button>
     </div>
-    <div class="row">
-      <button class="btn primary" onclick="calculate()">Вычислить</button>
-      <button class="btn" onclick="$('calcInput').value='';$('calcResult').textContent=''">Очистить</button>
-    </div>
-    <div class="result" id="calcResult"></div>
-    <hr>
-    <div class="hint">Поддерживаются: +, −, *, /, ^, скобки, sin, cos, tan, sqrt, abs, ln, log, exp, factorial. Тригонометрические функции принимают градусы.</div>
+    
+    <div class="result" id="calcResult" style="margin-top:20px;"></div>
   </div>
 
   <div class="tab-panel panel hidden" id="convertTab">
-    <h2>Конвертер единиц</h2>
+    <h2>Конвертер величин</h2>
     <div class="field"><label>Величина</label><select id="unitCategory" onchange="updateUnits()">
       <option value="length">Длина</option><option value="mass">Масса</option>
       <option value="time">Время</option><option value="speed">Скорость</option>
@@ -326,7 +388,7 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
 
 <section class="page" id="page-physics">
   <h1>Физика</h1>
-  <p class="subtitle">Справочник формул с расчётом по введённым значениям.</p>
+  <p class="subtitle">Справочник формул с расчётом по введённым значениям и разбор задач.</p>
   <div class="panel">
     <div class="field"><label>Раздел</label><select id="physicsCategory" onchange="updatePhysics()">
       <option value="kin">Кинематика</option>
@@ -349,7 +411,7 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
       <div class="field"><label>Условие</label><textarea id="problemInput" placeholder="Например: тело прошло 100 метров за 20 секунд. Найди скорость."></textarea></div>
       <button class="btn primary" onclick="solveWordProblem()">Разобрать</button>
       <div class="result" id="problemResult"></div>
-      <p class="hint">Автоматически разбираются простые задачи на путь, время и скорость. Для остальных задач выбери формулу выше.</p>
+      <p class="hint">Умный парсер автоматически определяет формулы для пути, скорости, силы, плотности и закона Ома.</p>
     </div>
   </div>
 </section>
@@ -374,13 +436,16 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
 
 <section class="page" id="page-documents">
   <h1>Мои документы</h1>
-  <p class="subtitle">Добавление текстовых материалов и поиск по содержимому.</p>
+  <p class="subtitle">Добавление материалов и поиск по содержимому.</p>
   <div class="panel">
-    <div class="field">
-      <label for="documentFiles">Выбрать файлы</label>
-      <input type="file" id="documentFiles" multiple accept=".txt,.md,.csv,.json,.html">
+    <h3>Добавить документ</h3>
+    <div class="row" style="margin-bottom: 15px;">
+      <button class="btn primary" onclick="document.getElementById('documentFiles').click()">Загрузить с устройства</button>
+      <button class="btn subtle" onclick="showLibraryPicker()">Выбрать из библиотеки</button>
+      <input type="file" id="documentFiles" multiple accept=".txt,.md,.csv,.json,.html" style="display:none">
     </div>
-    <p class="hint">Поддерживаются TXT, MD, CSV, JSON и HTML. Максимальный размер одного файла — 2 МБ. PDF и DOCX в этой версии не читаются.</p>
+    <p class="hint">Поддерживаются TXT, MD, CSV, JSON и HTML. Максимальный размер одного файла — 2 МБ. Заметки из библиотеки импортируются как документы.</p>
+    
     <hr>
     <div class="field"><label>Поиск по документам</label><input id="docQuery" placeholder="Слово или фраза"></div>
     <div class="row"><button class="btn primary" onclick="searchDocuments()">Искать</button><button class="btn" onclick="clearDocs()">Очистить документы</button></div>
@@ -390,7 +455,7 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
 
 <section class="page" id="page-library">
   <h1>Библиотека</h1>
-  <p class="subtitle">Личные заметки и материалы для повторения.</p>
+  <p class="subtitle">Личные заметки, конспекты и сохранённые отчёты.</p>
   <div class="panel">
     <div class="field"><label>Название</label><input id="noteTitle" placeholder="Например, Законы Ньютона"></div>
     <div class="field"><label>Содержание</label><textarea id="noteText" placeholder="Текст конспекта или заметки"></textarea></div>
@@ -404,26 +469,40 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
 
 <section class="page" id="page-gost">
   <h1>Оформление отчёта</h1>
-  <p class="subtitle">Подготовка титульного листа и основы учебной работы.</p>
+  <p class="subtitle">Подготовка титульного листа по стандартам ВУЗов и СПО.</p>
   <div class="panel">
+    <div class="field">
+      <label>Тип оформления</label>
+      <select id="gostType" onchange="updateGostForm()">
+        <option value="vuz">ГОСТ для ВУЗов</option>
+        <option value="spo">ГОСТ для СПО (Колледж)</option>
+      </select>
+    </div>
+    
     <div class="grid two">
       <div class="field"><label>Учебное заведение</label><input id="gInstitution" placeholder="Название учебного заведения"></div>
-      <div class="field"><label>Кафедра</label><input id="gDepartment" placeholder="Кафедра информатики"></div>
+      <div class="field"><label>Кафедра / Отделение</label><input id="gDepartment" placeholder="Кафедра информатики"></div>
       <div class="field"><label>Дисциплина</label><input id="gSubject" placeholder="Информатика"></div>
       <div class="field"><label>Тема работы</label><input id="gTopic" placeholder="Название темы"></div>
       <div class="field"><label>Студент</label><input id="gStudent" placeholder="ФИО"></div>
-      <div class="field"><label>Группа</label><input id="gGroup" placeholder="Номер группы"></div>
+      <div class="field"><label>Группа / Курс</label><input id="gGroup" placeholder="Номер группы"></div>
       <div class="field"><label>Преподаватель</label><input id="gTeacher" placeholder="ФИО преподавателя"></div>
       <div class="field"><label>Город</label><input id="gCity" placeholder="Город"></div>
       <div class="field"><label>Год</label><input id="gYear" value="2026"></div>
     </div>
     <div class="field"><label>Основной текст</label><textarea id="gBody" placeholder="Вставь введение, основную часть или текст отчёта."></textarea></div>
+    
     <div class="row">
       <button class="btn primary" onclick="previewGost()">Подготовить документ</button>
       <button class="btn" onclick="downloadGost()">Скачать для Word</button>
     </div>
     <div id="gostPreview" class="result"></div>
-    <p class="hint">Формируется HTML-файл, который можно открыть в Word и сохранить в формате DOCX. Точное оформление необходимо сверить с методическими требованиями учебного заведения.</p>
+    <p class="hint" style="margin-top:15px; padding:10px; background:#f9f9f8; border-left:3px solid var(--accent);">
+      <strong>Справка по списку литературы:</strong><br>
+      • <strong>ГОСТ Р 7.0.100-2018</strong> — действующий стандарт для ВУЗов (пример: <em>Иванов, И. И. Информатика: учебник / И. И. Иванов. — М.: Юрайт, 2023. — 250 с.</em>)<br>
+      • <strong>ГОСТ 7.32-2017</strong> — стандарт оформления отчетов о научно-исследовательской работе.<br>
+      • Для СПО часто используют упрощенные правила без указания типа источника.
+    </p>
   </div>
 </section>
 
@@ -432,7 +511,7 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
   <p class="subtitle">Информация о приложении и сохранённых данных.</p>
   <div class="panel">
     <div class="row between"><span>Название проекта</span><strong>МосНейро</strong></div><hr>
-    <div class="row between"><span>Версия интерфейса</span><span>1.1</span></div><hr>
+    <div class="row between"><span>Версия интерфейса</span><span>1.2 (Engineering)</span></div><hr>
     <div class="row between"><span>Математические расчёты</span><span class="badge">Локально</span></div><hr>
     <div class="row between"><span>Хранилище заметок</span><span class="badge">Браузер</span></div>
     <p class="hint">Заметки и список документов сохраняются в локальном хранилище браузера. Они не синхронизируются с исходной Python-базой данных.</p>
@@ -440,11 +519,6 @@ hr{border:0;border-top:1px solid var(--line);margin:15px 0}
       <button class="btn" onclick="exportBackup()">Экспортировать данные</button>
       <button class="btn danger" onclick="clearAllData()">Удалить сохранённые данные</button>
     </div>
-  </div>
-  <div class="panel section">
-    <h2>О проекте</h2>
-    <p>«МосНейро» — приложение для учебной и рабочей деятельности. Эта версия предоставляет математические инструменты, физические формулы, поиск справочных статей и работу с текстовыми материалами.</p>
-    <p class="hint">Веб-версия является отдельным интерфейсом и не заменяет автоматически модули исходного Python-проекта.</p>
   </div>
 </section>
 
@@ -486,7 +560,29 @@ document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
  document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("hidden",p.id!==b.dataset.tab));
 }));
 
-// Математический парсер без eval и Function.
+// ================= КАЛЬКУЛЯТОР =================
+let lastAns = 0;
+
+function calcInsert(val) {
+  let input = $("calcInput");
+  if (input.value === "0" || input.value === "Ошибка") input.value = "";
+  input.value += val;
+  input.focus();
+}
+
+function calcClearAll() {
+  $("calcInput").value = "";
+  $("calcResult").textContent = "";
+  lastAns = 0;
+}
+
+function calcBackspace() {
+  let input = $("calcInput");
+  input.value = input.value.slice(0, -1);
+  input.focus();
+}
+
+// Математический парсер без eval
 function tokenize(s){
  s=s.replace(/π/g,"pi").replace(/×/g,"*").replace(/÷/g,"/");
  const out=[];let i=0;
@@ -509,7 +605,7 @@ function parseMath(source){
  const ts=tokenize(source);let pos=0;
  const peek=()=>ts[pos],take=()=>ts[pos++];
  const expect=t=>{if(peek().t!==t)throw Error("Проверь скобки и выражение");return take()};
- const constants={pi:Math.PI,e:Math.E};
+ const constants={pi:Math.PI,e:Math.E,ans:lastAns};
  const funcs={
   sin:x=>Math.sin(x*Math.PI/180),cos:x=>Math.cos(x*Math.PI/180),
   tan:x=>Math.tan(x*Math.PI/180),asin:x=>Math.asin(x)*180/Math.PI,
@@ -524,7 +620,7 @@ function parseMath(source){
   if(peek().t==="("){take();const x=expr();expect(")");return x}
   if(peek().t==="id"){
    const name=take().v;
-   if(name==="pi"||name==="e")return constants[name];
+   if(name in constants)return constants[name];
    if(name==="factorial"){expect("(");const x=expr();expect(")");return fact(x)}
    if(!(name in funcs))throw Error("Неизвестная функция: "+name);
    expect("(");const x=expr();expect(")");
@@ -550,18 +646,30 @@ function parseMath(source){
   }return x;
  }
  const result=expr();
- if(peek().t==="!")throw Error("Для факториала используй factorial(5)");
+ if(peek().t==="!")throw Error("Для факториала используй n! перед числом или factorial()");
  if(peek().t!=="eof")throw Error("Лишние символы в выражении");
  if(!Number.isFinite(result))throw Error("Результат не является конечным числом");
  return result;
 }
-function calculate(){
- try{$("calcResult").textContent="Результат: "+parseMath($("calcInput").value.replace(/,/g,"."))}
- catch(e){$("calcResult").textContent="Ошибка: "+e.message}
-}
-$("calcInput").addEventListener("keydown",e=>{if(e.key==="Enter")calculate()});
 
-// Конвертер.
+function calculate(){
+ let expr = $("calcInput").value.trim();
+ if(!expr) return;
+ // Обработка факториала в конце (например, 5!)
+ if (expr.endsWith("!")) {
+   expr = "factorial(" + expr.slice(0, -1) + ")";
+ }
+ try{
+   const result = parseMath(expr);
+   lastAns = result;
+   $("calcResult").textContent = "= " + Number(result.toPrecision(12));
+   $("calcInput").value = result; // Заменяем выражение на результат для удобства
+ } catch(e) {
+   $("calcResult").textContent = "Ошибка: " + e.message;
+ }
+}
+
+// ================= КОНВЕРТЕР =================
 const unitData={
  length:{м:1,км:1000,см:.01,мм:.001,миля:1609.344,фут:.3048},
  mass:{кг:1,г:.001,мг:.000001,т:1000,фунт:.45359237},
@@ -585,7 +693,7 @@ function convertUnits(){
 }
 updateUnits();
 
-// Расчёт по математическим формулам.
+// ================= ФОРМУЛЫ =================
 const templates={
  circle:{labels:["Радиус r"],run:v=>Math.PI*v[0]**2+" — площадь круга"},
  triangle:{labels:["Основание a","Высота h"],run:v=>v[0]*v[1]/2+" — площадь треугольника"},
@@ -612,7 +720,7 @@ function solveTemplate(){
 }
 updateTemplate();
 
-// Справочник физических формул.
+// ================= ФИЗИКА =================
 const physics={
  kin:[
   {name:"Скорость: v = s / t",fields:["Путь s (м)","Время t (с)"],unit:"м/с",desc:"Средняя скорость равна пути, делённому на время.",fn:v=>v[0]/v[1],check:v=>v[1]!==0},
@@ -666,16 +774,45 @@ function solveWordProblem(){
  const s=$("problemInput").value.toLowerCase();
  const nums=(s.match(/-?\d+(?:[.,]\d+)?/g)||[]).map(x=>Number(x.replace(",",".")));
  if(nums.length<2)return $("problemResult").textContent="Укажи в условии хотя бы два числовых значения.";
- if(/скорост|прош[её]л|проехал|путь/.test(s)&&/секунд|час|врем/.test(s)){
-  const dist=nums[0],time=nums[1];
-  if(time===0)return $("problemResult").textContent="Время не может быть равно нулю.";
-  $("problemResult").textContent=`Дано:\ns = ${dist}\nt = ${time}\n\nФормула: v = s / t\nПодстановка: v = ${dist} / ${time}\nОтвет: v = ${dist/time} в единицах пути за единицу времени.\n\nПроверь единицы измерения.`;
- }else{
-  $("problemResult").textContent="Тип задачи не определён автоматически.\n\n1. Выпиши известные величины.\n2. Определи искомую величину.\n3. Выбери формулу из справочника выше.\n4. Подставь значения и единицы измерения.";
+ 
+ let res = "Дано:\n";
+ let formula = "";
+ let answer = "";
+ 
+ if(/скорост|прош[её]л|проехал|путь/.test(s) && /секунд|час|врем/.test(s)){
+  const dist=nums[0], time=nums[1];
+  if(time===0) return $("problemResult").textContent="Время не может быть равно нулю.";
+  res += `s = ${dist}\nt = ${time}\n\n`;
+  formula = "v = s / t";
+  answer = `v = ${dist} / ${time} = ${dist/time} м/с`;
+ } else if(/сила|масс|ускор/.test(s)) {
+  const mass = nums[0], accel = nums[1];
+  res += `m = ${mass} кг\na = ${accel} м/с²\n\n`;
+  formula = "F = m × a";
+  answer = `F = ${mass} * ${accel} = ${mass*accel} Н`;
+ } else if(/работ|энерги|джоул/.test(s)) {
+  const force = nums[0], dist = nums[1];
+  res += `F = ${force} Н\ns = ${dist} м\n\n`;
+  formula = "A = F × s";
+  answer = `A = ${force} * ${dist} = ${force*dist} Дж`;
+ } else if(/напряжен|сопротивлен|ток|ом|вольт/.test(s)) {
+  const volt = nums[0], ohm = nums[1];
+  res += `U = ${volt} В\nR = ${ohm} Ом\n\n`;
+  formula = "I = U / R";
+  answer = `I = ${volt} / ${ohm} = ${volt/ohm} А`;
+ } else if(/плотност|объ[её]м/.test(s)) {
+  const mass = nums[0], vol = nums[1];
+  res += `m = ${mass} кг\nV = ${vol} м³\n\n`;
+  formula = "ρ = m / V";
+  answer = `ρ = ${mass} / ${vol} = ${mass/vol} кг/м³`;
+ } else {
+  return $("problemResult").textContent="Тип задачи не определён автоматически.\n\n1. Выпиши известные величины.\n2. Определи искомую величину.\n3. Выбери формулу из справочника выше.\n4. Подставь значения и единицы измерения.";
  }
+ 
+ $("problemResult").textContent = res + `Формула: ${formula}\nОтвет: ${answer}\n\nПроверь единицы измерения.`;
 }
 
-// Поиск статей.
+// ================= ПОИСК В СЕТИ =================
 async function searchWiki(q,target){
  const el=$(target);el.innerHTML='<div class="empty">Выполняется поиск...</div>';
  try{
@@ -699,8 +836,10 @@ async function searchWiki(q,target){
 $("searchForm").addEventListener("submit",e=>{e.preventDefault();searchWiki($("searchInput").value.trim(),"searchResults")});
 function quickSearch(q){$("searchInput").value=q;searchWiki(q,"searchResults")}
 
-// Текстовые документы.
+// ================= ДОКУМЕНТЫ И БИБЛИОТЕКА =================
 let docs=readStore("docs",[]);
+let notes=readStore("notes",[]);
+
 $("documentFiles").addEventListener("change",async e=>{
  for(const file of e.target.files){
   if(file.size>2*1024*1024){alert(file.name+": файл больше 2 МБ.");continue}
@@ -711,6 +850,27 @@ $("documentFiles").addEventListener("change",async e=>{
  $("documentResults").textContent=`Добавлено документов: ${docs.length}.`;
  e.target.value="";
 });
+
+function showLibraryPicker() {
+  if (notes.length === 0) {
+    alert("В библиотеке пока нет сохраненных заметок или отчетов.");
+    return;
+  }
+  let options = notes.map((n, i) => `${i + 1}. ${n.title}`).join("\n");
+  let res = prompt("Выберите номер заметки для добавления в документы:\n\n" + options);
+  if (res) {
+    let idx = parseInt(res) - 1;
+    if (idx >= 0 && idx < notes.length) {
+      docs.push({name: notes[idx].title, text: notes[idx].text});
+      writeStore("docs", docs);
+      updateStats();
+      $("documentResults").textContent = `Документ "${notes[idx].title}" успешно добавлен.`;
+    } else {
+      alert("Неверный номер.");
+    }
+  }
+}
+
 function searchDocuments(){
  const q=$("docQuery").value.trim().toLowerCase(),out=$("documentResults");out.innerHTML="";
  if(!q)return out.textContent="Введи запрос для поиска.";
@@ -731,8 +891,6 @@ function clearDocs(){
  docs=[];writeStore("docs",docs);updateStats();$("documentResults").textContent="";
 }
 
-// Личная библиотека.
-let notes=readStore("notes",[]);
 function saveNote(){
  const title=$("noteTitle").value.trim(),text=$("noteText").value.trim();
  if(!title||!text)return alert("Заполни название и содержание заметки.");
@@ -757,16 +915,28 @@ function renderNotes(){
  });
 }
 
-// Создание HTML-отчёта для открытия в Word.
+// ================= ГОСТ =================
+function updateGostForm() {
+  const type = $("gostType").value;
+  if (type === "spo") {
+    $("gDepartment").placeholder = "Отделение / Специальность";
+  } else {
+    $("gDepartment").placeholder = "Кафедра";
+  }
+}
+
 function gostData(){
  const get=id=>$(id).value.trim();
- return {institution:get("gInstitution"),department:get("gDepartment"),subject:get("gSubject"),topic:get("gTopic"),
+ return {type: get("gostType"), institution:get("gInstitution"),department:get("gDepartment"),subject:get("gSubject"),topic:get("gTopic"),
  student:get("gStudent"),group:get("gGroup"),teacher:get("gTeacher"),city:get("gCity"),
  year:get("gYear")||String(new Date().getFullYear()),body:get("gBody")};
 }
 function makeGost(){
  const d=gostData();
  if(!d.institution||!d.subject||!d.topic||!d.student)throw Error("Заполни учебное заведение, дисциплину, тему и ФИО студента.");
+ 
+ const titleText = d.type === "spo" ? "СПЕЦИАЛЬНОСТЬ: " + (d.department || "________________") : d.department;
+ 
  return `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>${esc(d.topic)}</title>
  <style>@page{size:A4;margin:20mm 15mm 20mm 30mm}
  body{font-family:"Times New Roman",serif;font-size:14pt;line-height:1.5;color:#000}
@@ -774,13 +944,14 @@ function makeGost(){
  .institution{font-weight:bold;text-transform:uppercase}
  .work{margin-top:35mm}.author{margin-top:20mm;text-align:right}
  .bottom{margin-top:auto;margin-bottom:5mm}
- h1{text-align:center;font-size:14pt;text-transform:uppercase}
+ h1{text-align:center;font-size:14pt;text-transform:uppercase; page-break-before: always;}
+ h1:first-of-type { page-break-before: avoid; }
  p{text-align:justify;text-indent:1.25cm}
  </style></head><body>
  <div class="titlepage">
- <div class="institution">${esc(d.institution)}<br>${esc(d.department)}</div>
+ <div class="institution">${esc(d.institution)}<br>${esc(titleText)}</div>
  <div class="work">${esc(d.subject)}<h2>${esc(d.topic)}</h2></div>
- <div class="author">Выполнил(а): ${esc(d.student)}<br>Группа: ${esc(d.group||"________________")}<br>Проверил(а): ${esc(d.teacher||"________________")}</div>
+ <div class="author">Выполнил(а): ${esc(d.student)}<br>Группа/Курс: ${esc(d.group||"________________")}<br>Проверил(а): ${esc(d.teacher||"________________")}</div>
  <div class="bottom">${esc(d.city)}<br>${esc(d.year)}</div></div>
  <h1>Введение</h1><p>${esc(d.body||"Укажи актуальность темы, цель и задачи работы.")}</p>
  <h1>Основная часть</h1><p>Изложи теоретические положения, методику выполнения работы и полученные результаты.</p>
@@ -788,10 +959,29 @@ function makeGost(){
  <h1>Список использованных источников</h1><p>1. Укажи использованные учебники, статьи и электронные ресурсы.</p>
  </body></html>`;
 }
+
 function previewGost(){
- try{makeGost();$("gostPreview").textContent="Документ подготовлен. Нажми «Скачать для Word», чтобы сохранить файл."}
- catch(e){$("gostPreview").textContent="Ошибка: "+e.message}
+ try{
+   const d = gostData();
+   makeGost();
+   $("gostPreview").textContent="Документ подготовлен. Нажми «Скачать для Word», чтобы сохранить файл.";
+   
+   // Автосохранение в библиотеку
+   const noteTitle = `[Отчет] ${d.subject} - ${d.topic}`;
+   const noteText = `Отчет (${d.type === 'spo' ? 'СПО' : 'ВУЗ'})\nСтудент: ${d.student}\nГруппа: ${d.group}\nПреподаватель: ${d.teacher}\n\nТекст:\n${d.body || 'Текст не введен.'}`;
+   
+   // Проверка, чтобы не дублировать
+   if (!notes.some(n => n.title === noteTitle)) {
+       notes.unshift({id: Date.now(), title: noteTitle, text: noteText, date: new Date().toLocaleDateString("ru-RU")});
+       writeStore("notes", notes);
+       updateStats();
+       $("gostPreview").textContent += " Отчёт также автоматически сохранён в Библиотеку.";
+   }
+ } catch(e) {
+   $("gostPreview").textContent="Ошибка: "+e.message;
+ }
 }
+
 function downloadFile(name,content,type){
  const blob=new Blob(["\ufeff",content],{type});
  const url=URL.createObjectURL(blob),a=document.createElement("a");
@@ -803,14 +993,14 @@ function downloadGost(){
  catch(e){alert(e.message)}
 }
 
-// Резервная копия и обслуживание данных.
+// ================= СИСТЕМНОЕ =================
 function updateStats(){
  $("statNotes").textContent=notes.length;
  $("statDocs").textContent=docs.length;
 }
 function exportBackup(){
  downloadFile("МосНейро_резервная_копия.json",
-  JSON.stringify({project:"МосНейро",version:"1.1",notes,docs,exportedAt:new Date().toISOString()},null,2),
+  JSON.stringify({project:"МосНейро",version:"1.2",notes,docs,exportedAt:new Date().toISOString()},null,2),
   "application/json;charset=utf-8");
 }
 function clearAllData(){
