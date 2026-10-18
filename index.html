@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>МосНейро</title>
+<style>
+:root {
+  --bg:#f5f5f2;
+  --panel:#ffffff;
+  --text:#252923;
+  --muted:#777b73;
+  --line:#e5e6df;
+  --accent:#526b52;
+  --accent-light:#e9eee6;
+  --orange:#bd754b;
+  --radius:9px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  color:var(--text);
+  background:var(--bg);
+  font:14px/1.5 "Segoe UI",Arial,sans-serif;
+}
+button,input,textarea,select{font:inherit}
+button{cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{
+  outline:2px solid var(--accent);outline-offset:2px
+}
+.layout{min-height:100vh;display:flex}
+.sidebar{
+  width:232px;flex-shrink:0;background:#fff;
+  border-right:1px solid var(--line);padding:25px 15px;
+  display:flex;flex-direction:column
+}
+.brand{padding:0 10px 25px;border-bottom:1px solid var(--line)}
+.brand-name{font-size:23px;font-weight:750;letter-spacing:-1px}
+.brand-name span{color:var(--accent)}
+.brand-sub{font-size:12px;color:var(--muted);margin-top:3px}
+.nav-label{
+  color:#92958b;font-size:10px;font-weight:700;
+  letter-spacing:1.1px;padding:23px 10px 8px
+}
+.nav{
+  display:flex;align-items:center;gap:11px;width:100%;
+  padding:10px 11px;margin:2px 0;border:0;border-radius:6px;
+  background:transparent;text-align:left;color:#555a52
+}
+.nav-icon{width:20px;text-align:center;font-size:16px}
+.nav:hover{background:#f4f5f0}
+.nav.active{background:var(--accent-light);color:#344b34;font-weight:650}
+.side-bottom{
+  margin-top:auto;border-top:1px solid var(--line);
+  padding:15px 10px 0;color:var(--muted);font-size:11px
+}
+.main{flex:1;min-width:0}
+.topbar{
+  min-height:65px;background:#fff;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 34px
+}
+.breadcrumb{color:var(--muted);font-size:12px}
+.top-title{font-weight:650;font-size:15px;margin-top:2px}
+.top-right{display:flex;align-items:center;gap:10px}
+.local-label{font-size:12px;color:var(--accent)}
+.content{max-width:1120px;margin:auto;padding:32px 34px 45px}
+.page{display:none}
+.page.active{display:block;animation:show .16s ease}
+@keyframes show{from{opacity:.6}to{opacity:1}}
+h1{font-size:27px;letter-spacing:-.7px;font-weight:650;margin:0 0 6px}
+h2{font-size:17px;font-weight:650;margin:0 0 15px}
+h3{font-size:14px;font-weight:650;margin:0 0 7px}
+.subtitle{color:var(--muted);margin:0 0 25px;font-size:13px}
+.section{margin-top:29px}
+.section-head{
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:13px
+}
+.section-head h2{margin:0}
+.panel{
+  background:var(--panel);border:1px solid var(--line);
+  border-radius:var(--radius);padding:21px
+}
+.grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:13px}
+.grid.two{grid-template-columns:repeat(2,minmax(0,1fr))}
+.tool{
+  background:white;border:1px solid var(--line);border-radius:var(--radius);
+  padding:18px;text-align:left;min-width:0;color:var(--text);
+  transition:border-color .15s,background .15s
+}
+.tool:hover{border-color:#a9b8a5;background:#fcfcfa}
+.tool-icon{font-size:17px;color:var(--accent);margin-bottom:15px}
+.tool p{font-size:12px;color:var(--muted);margin:5px 0 0;line-height:1.55}
+.home-intro{
+  background:#e9eee6;border:1px solid #dce4d7;border-radius:10px;
+  padding:28px 30px;display:flex;align-items:center;justify-content:space-between;
+  gap:20px
+}
+.home-intro h1{font-size:29px}
+.home-intro p{max-width:520px;color:#626b5e;margin:10px 0 17px}
+.intro-mark{font-size:58px;color:#82917b;padding:0 20px}
+.btn{
+  padding:9px 13px;border:1px solid var(--line);border-radius:6px;
+  background:#fff;color:var(--text);font-weight:550
+}
+.btn:hover{background:#f5f6f1;border-color:#c9cec2}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+.btn.primary:hover{background:#405840}
+.btn.subtle{background:var(--accent-light);border-color:transparent;color:#354b34}
+.btn.danger{color:#a13e34}
+.btn.small{font-size:12px;padding:6px 9px}
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:15px;min-width:0}
+label{font-size:12px;color:#555a52;font-weight:650}
+input,textarea,select{
+  width:100%;min-width:0;padding:10px 11px;
+  background:#fff;color:var(--text);
+  border:1px solid #dfe1d9;border-radius:6px
+}
+input:focus,textarea:focus,select:focus{outline:none;border-color:#81977c}
+textarea{resize:vertical;min-height:110px;line-height:1.6}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+.result{
+  white-space:pre-wrap;overflow-wrap:anywhere;margin-top:14px;
+  padding:13px;background:#f5f6f2;border:1px solid var(--line);
+  border-radius:6px
+}
+.result:empty{display:none}
+.hint{font-size:12px;color:var(--muted);line-height:1.6}
+.tabs{display:flex;gap:5px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.tab{padding:9px 12px;background:none;border:0;border-bottom:2px solid transparent;color:var(--muted)}
+.tab.active{border-bottom-color:var(--accent);color:var(--accent);font-weight:650}
+.tab-panel.hidden{display:none}
+.stat{font-size:25px;font-weight:700;margin:9px 0 3px}
+.stat-label{font-size:12px;color:var(--muted)}
+.stat-card{background:white;border:1px solid var(--line);border-radius:8px;padding:17px}
+.list-item{padding:14px 0;border-bottom:1px solid var(--line)}
+.list-item:last-child{border-bottom:0}
+.list-item a{color:#426345;font-weight:650;overflow-wrap:anywhere}
+.list-item p{margin:5px 0 0;font-size:12px;color:var(--muted)}
+.badge{
+  display:inline-block;font-size:10px;color:#536b4d;
+  background:#edf1e9;padding:3px 7px;border-radius:4px;margin-bottom:5px
+}
+.empty{text-align:center;padding:25px 10px;color:var(--muted);font-size:13px}
+.footer{margin-top:35px;text-align:center;color:#92958b;font-size:11px}
+.mobile-toggle{display:none}
+hr{border:0;border-top:1px solid var(--line);margin:15px 0}
+@media(max-width:900px){
+ .sidebar{width:205px}.content{padding:25px 20px}
+ .grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .topbar{padding:0 20px}
+}
+@media(max-width:620px){
+ .layout{display:block}
+ .sidebar{display:none;width:100%;border-right:0;border-bottom:1px solid var(--line);padding:14px}
+ .sidebar.open{display:flex}
+ .brand{padding-bottom:13px}.side-bottom{display:none}
+ .topbar{padding:0 14px;min-height:60px}
+ .mobile-toggle{display:inline-block}
+ .content{padding:22px 13px 35px}
+ .grid,.grid.two{grid-template-columns:1fr}
+ .home-intro{padding:22px 19px}
+ .home-intro h1{font-size:25px}
+ .intro-mark{display:none}
+ h1{font-size:24px}
+ .panel{padding:15px}
+}
+</style>
+</head>
+<body>
+<div class="layout">
+<aside class="sidebar" id="sidebar">
+  <div class="brand">
+    <div class="brand-name">Мос<span>Нейро</span></div>
+    <div class="brand-sub">Учебные инструменты</div>
+  </div>
+
+  <div class="nav-label">РАБОЧИЙ СТОЛ</div>
+  <button class="nav active" data-page="home"><span class="nav-icon">⌂</span>Главная</button>
+  <button class="nav" data-page="math"><span class="nav-icon">∑</span>Математика</button>
+  <button class="nav" data-page="physics"><span class="nav-icon">◈</span>Физика</button>
+  <button class="nav" data-page="search"><span class="nav-icon">⌕</span>Поиск в сети</button>
+
+  <div class="nav-label">МАТЕРИАЛЫ</div>
+  <button class="nav" data-page="documents"><span class="nav-icon">▤</span>Мои документы</button>
+  <button class="nav" data-page="library"><span class="nav-icon">▣</span>Библиотека</button>
+  <button class="nav" data-page="gost"><span class="nav-icon">▧</span>Оформление отчёта</button>
+
+  <div class="nav-label">ПРИЛОЖЕНИЕ</div>
+  <button class="nav" data-page="settings"><span class="nav-icon">⚙</span>Настройки</button>
+
+  <div class="side-bottom">
+    МосНейро<br>
+    Учебная версия 1.1
+  </div>
+</aside>
+
+<main class="main">
+<header class="topbar">
+  <div class="row">
+    <button class="btn mobile-toggle" id="menuBtn" aria-label="Меню">☰</button>
+    <div>
+      <div class="breadcrumb">МосНейро / Рабочая область</div>
+      <div class="top-title" id="topTitle">Главная</div>
+    </div>
+  </div>
+  <div class="top-right"><span class="local-label">● Готово к работе</span></div>
+</header>
+
+<div class="content">
+
+<section class="page active" id="page-home">
+  <div class="home-intro">
+    <div>
+      <h1>Рабочая область</h1>
+      <p>Инструменты для расчётов, изучения физических формул и работы с учебными материалами.</p>
+      <button class="btn primary" onclick="showPage('math')">Открыть калькулятор</button>
+    </div>
+    <div class="intro-mark">∑</div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Инструменты</h2></div>
+    <div class="grid">
+      <button class="tool" onclick="showPage('math')">
+        <div class="tool-icon">01 / МАТЕМАТИКА</div>
+        <h3>Калькулятор</h3>
+        <p>Вычисления, математические функции и конвертация единиц.</p>
+      </button>
+      <button class="tool" onclick="showPage('physics')">
+        <div class="tool-icon">02 / ФИЗИКА</div>
+        <h3>Формулы и задачи</h3>
+        <p>Основные формулы механики, электричества и термодинамики.</p>
+      </button>
+      <button class="tool" onclick="showPage('search')">
+        <div class="tool-icon">03 / СПРАВКА</div>
+        <h3>Поиск информации</h3>
+        <p>Поиск статей и справочных материалов в Википедии.</p>
+      </button>
+      <button class="tool" onclick="showPage('documents')">
+        <div class="tool-icon">04 / ФАЙЛЫ</div>
+        <h3>Мои документы</h3>
+        <p>Загрузка текстовых файлов и поиск по их содержимому.</p>
+      </button>
+      <button class="tool" onclick="showPage('library')">
+        <div class="tool-icon">05 / ЗАМЕТКИ</div>
+        <h3>Библиотека</h3>
+        <p>Личные конспекты, заметки и сохранённые материалы.</p>
+      </button>
+      <button class="tool" onclick="showPage('gost')">
+        <div class="tool-icon">06 / ДОКУМЕНТЫ</div>
+        <h3>Оформление отчёта</h3>
+        <p>Титульный лист и основа учебной работы для Word.</p>
+      </button>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-head"><h2>Состояние рабочего пространства</h2></div>
+    <div class="grid">
+      <div class="stat-card"><div class="stat-label">Сохранённые заметки</div><div class="stat" id="statNotes">0</div></div>
+      <div class="stat-card"><div class="stat-label">Добавленные документы</div><div class="stat" id="statDocs">0</div></div>
+      <div class="stat-card"><div class="stat-label">Последнее обновление</div><div class="stat" style="font-size:16px" id="today"></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-math">
+  <h1>Математика</h1>
+  <p class="subtitle">Численные вычисления и повседневные математические задачи.</p>
+  <div class="tabs">
+    <button class="tab active" data-tab="calcTab">Калькулятор</button>
+    <button class="tab" data-tab="convertTab">Конвертер</button>
+    <button class="tab" data-tab="templatesTab">Формулы</button>
+  </div>
+
+  <div class="tab-panel panel" id="calcTab">
+    <h2>Калькулятор</h2>
+    <div class="field">
+      <label for="calcInput">Выражение</label>
+      <input id="calcInput" value="2+3*4" placeholder="Например: sqrt(144) + 2^3">
+    </div>
+    <div class="row">
+      <button class="btn primary" onclick="calculate()">Вычислить</button>
+      <button class="btn" onclick="$('calcInput').value='';$('calcResult').textContent=''">Очистить</button>
+    </div>
+    <div class="result" id="calcResult"></div>
+    <hr>
+    <div class="hint">Поддерживаются: +, −, *, /, ^, скобки, sin, cos, tan, sqrt, abs, ln, log, exp, factorial. Тригонометрические функции принимают градусы.</div>
+  </div>
+
+  <div class="tab-panel panel hidden" id="convertTab">
+    <h2>Конвертер единиц</h2>
+    <div class="field"><label>Величина</label><select id="unitCategory" onchange="updateUnits()">
+      <option value="length">Длина</option><option value="mass">Масса</option>
+      <option value="time">Время</option><option value="speed">Скорость</option>
+      <option value="area">Площадь</option><option value="volume">Объём</option>
+      <option value="energy">Энергия</option><option value="pressure">Давление</option>
+    </select></div>
+    <div class="grid two">
+      <div class="field"><label>Значение</label><input id="unitValue" type="number" value="1"></div>
+      <div class="field"><label>Исходная единица</label><select id="unitFrom"></select></div>
+      <div class="field"><label>Результат в</label><select id="unitTo"></select></div>
+    </div>
+    <button class="btn primary" onclick="convertUnits()">Конвертировать</button>
+    <div class="result" id="unitResult"></div>
+  </div>
+
+  <div class="tab-panel panel hidden" id="templatesTab">
+    <h2>Расчёт по формуле</h2>
+    <div class="field"><label>Выбери задачу</label><select id="mathTemplate" onchange="updateTemplate()">
+      <option value="circle">Площадь круга</option>
+      <option value="triangle">Площадь треугольника</option>
+      <option value="pythagoras">Теорема Пифагора</option>
+      <option value="percent">Процент от числа</option>
+      <option value="quadratic">Квадратное уравнение</option>
+      <option value="sphere">Объём шара</option>
+    </select></div>
+    <div id="templateFields" class="grid two"></div>
+    <button class="btn primary" onclick="solveTemplate()">Рассчитать</button>
+    <div class="result" id="templateResult"></div>
+  </div>
+</section>
+
+<section class="page" id="page-physics">
+  <h1>Физика</h1>
+  <p class="subtitle">Справочник формул с расчётом по введённым значениям.</p>
+  <div class="panel">
+    <div class="field"><label>Раздел</label><select id="physicsCategory" onchange="updatePhysics()">
+      <option value="kin">Кинематика</option>
+      <option value="dyn">Динамика</option>
+      <option value="elec">Электричество</option>
+      <option value="energy">Работа и энергия</option>
+      <option value="density">Плотность и давление</option>
+      <option value="thermo">Теплота</option>
+    </select></div>
+    <div class="field"><label>Формула</label><select id="physicsFormula" onchange="renderPhysicsFields()"></select></div>
+    <div id="physicsFields" class="grid two"></div>
+    <button class="btn primary" onclick="solvePhysics()">Вычислить</button>
+    <div class="result" id="physicsResult"></div>
+    <p class="hint" id="physicsDescription"></p>
+  </div>
+
+  <div class="section">
+    <h2>Разбор простой задачи</h2>
+    <div class="panel">
+      <div class="field"><label>Условие</label><textarea id="problemInput" placeholder="Например: тело прошло 100 метров за 20 секунд. Найди скорость."></textarea></div>
+      <button class="btn primary" onclick="solveWordProblem()">Разобрать</button>
+      <div class="result" id="problemResult"></div>
+      <p class="hint">Автоматически разбираются простые задачи на путь, время и скорость. Для остальных задач выбери формулу выше.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page" id="page-search">
+  <h1>Поиск в сети</h1>
+  <p class="subtitle">Поиск справочных статей через открытый API Википедии.</p>
+  <div class="panel">
+    <form id="searchForm" class="row">
+      <input id="searchInput" placeholder="Название темы или понятие" required style="flex:1">
+      <button class="btn primary">Найти</button>
+    </form>
+    <div class="row" style="margin-top:12px">
+      <button class="btn small" onclick="quickSearch('Python')">Python</button>
+      <button class="btn small" onclick="quickSearch('Закон Ома')">Закон Ома</button>
+      <button class="btn small" onclick="quickSearch('Математика')">Математика</button>
+    </div>
+  </div>
+  <div class="panel section" id="searchResults"><div class="empty">Результаты поиска появятся здесь.</div></div>
+  <p class="hint">Для работы необходим интернет. Результаты ведут на страницы Википедии.</p>
+</section>
+
+<section class="page" id="page-documents">
+  <h1>Мои документы</h1>
+  <p class="subtitle">Добавление текстовых материалов и поиск по содержимому.</p>
+  <div class="panel">
+    <div class="field">
+      <label for="documentFiles">Выбрать файлы</label>
+      <input type="file" id="documentFiles" multiple accept=".txt,.md,.csv,.json,.html">
+    </div>
+    <p class="hint">Поддерживаются TXT, MD, CSV, JSON и HTML. Максимальный размер одного файла — 2 МБ. PDF и DOCX в этой версии не читаются.</p>
+    <hr>
+    <div class="field"><label>Поиск по документам</label><input id="docQuery" placeholder="Слово или фраза"></div>
+    <div class="row"><button class="btn primary" onclick="searchDocuments()">Искать</button><button class="btn" onclick="clearDocs()">Очистить документы</button></div>
+    <div id="documentResults"></div>
+  </div>
+</section>
+
+<section class="page" id="page-library">
+  <h1>Библиотека</h1>
+  <p class="subtitle">Личные заметки и материалы для повторения.</p>
+  <div class="panel">
+    <div class="field"><label>Название</label><input id="noteTitle" placeholder="Например, Законы Ньютона"></div>
+    <div class="field"><label>Содержание</label><textarea id="noteText" placeholder="Текст конспекта или заметки"></textarea></div>
+    <button class="btn primary" onclick="saveNote()">Сохранить заметку</button>
+  </div>
+  <div class="panel section">
+    <div class="field"><label>Поиск по библиотеке</label><input id="libraryQuery" placeholder="Название или текст" oninput="renderNotes()"></div>
+    <div id="notesList"></div>
+  </div>
+</section>
+
+<section class="page" id="page-gost">
+  <h1>Оформление отчёта</h1>
+  <p class="subtitle">Подготовка титульного листа и основы учебной работы.</p>
+  <div class="panel">
+    <div class="grid two">
+      <div class="field"><label>Учебное заведение</label><input id="gInstitution" placeholder="Название учебного заведения"></div>
+      <div class="field"><label>Кафедра</label><input id="gDepartment" placeholder="Кафедра информатики"></div>
+      <div class="field"><label>Дисциплина</label><input id="gSubject" placeholder="Информатика"></div>
+      <div class="field"><label>Тема работы</label><input id="gTopic" placeholder="Название темы"></div>
+      <div class="field"><label>Студент</label><input id="gStudent" placeholder="ФИО"></div>
+      <div class="field"><label>Группа</label><input id="gGroup" placeholder="Номер группы"></div>
+      <div class="field"><label>Преподаватель</label><input id="gTeacher" placeholder="ФИО преподавателя"></div>
+      <div class="field"><label>Город</label><input id="gCity" placeholder="Город"></div>
+      <div class="field"><label>Год</label><input id="gYear" value="2026"></div>
+    </div>
+    <div class="field"><label>Основной текст</label><textarea id="gBody" placeholder="Вставь введение, основную часть или текст отчёта."></textarea></div>
+    <div class="row">
+      <button class="btn primary" onclick="previewGost()">Подготовить документ</button>
+      <button class="btn" onclick="downloadGost()">Скачать для Word</button>
+    </div>
+    <div id="gostPreview" class="result"></div>
+    <p class="hint">Формируется HTML-файл, который можно открыть в Word и сохранить в формате DOCX. Точное оформление необходимо сверить с методическими требованиями учебного заведения.</p>
+  </div>
+</section>
+
+<section class="page" id="page-settings">
+  <h1>Настройки</h1>
+  <p class="subtitle">Информация о приложении и сохранённых данных.</p>
+  <div class="panel">
+    <div class="row between"><span>Название проекта</span><strong>МосНейро</strong></div><hr>
+    <div class="row between"><span>Версия интерфейса</span><span>1.1</span></div><hr>
+    <div class="row between"><span>Математические расчёты</span><span class="badge">Локально</span></div><hr>
+    <div class="row between"><span>Хранилище заметок</span><span class="badge">Браузер</span></div>
+    <p class="hint">Заметки и список документов сохраняются в локальном хранилище браузера. Они не синхронизируются с исходной Python-базой данных.</p>
+    <div class="row">
+      <button class="btn" onclick="exportBackup()">Экспортировать данные</button>
+      <button class="btn danger" onclick="clearAllData()">Удалить сохранённые данные</button>
+    </div>
+  </div>
+  <div class="panel section">
+    <h2>О проекте</h2>
+    <p>«МосНейро» — приложение для учебной и рабочей деятельности. Эта версия предоставляет математические инструменты, физические формулы, поиск справочных статей и работу с текстовыми материалами.</p>
+    <p class="hint">Веб-версия является отдельным интерфейсом и не заменяет автоматически модули исходного Python-проекта.</p>
+  </div>
+</section>
+
+<div class="footer">МосНейро · Учебные инструменты</div>
+</div>
+</main>
+</div>
+
+<script>
+"use strict";
+const $=id=>document.getElementById(id);
+const pageTitles={home:"Главная",math:"Математика",physics:"Физика",search:"Поиск в сети",documents:"Мои документы",library:"Библиотека",gost:"Оформление отчёта",settings:"Настройки"};
+
+function readStore(k,fallback){
+ try{const v=localStorage.getItem("mosneiro_"+k);return v===null?fallback:JSON.parse(v)}
+ catch{return fallback}
+}
+function writeStore(k,v){
+ try{localStorage.setItem("mosneiro_"+k,JSON.stringify(v))}
+ catch{alert("Не удалось сохранить данные. Проверь свободное место в хранилище браузера.")}
+}
+function esc(s){
+ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+}
+function showPage(name){
+ document.querySelectorAll(".page").forEach(p=>p.classList.remove("active"));
+ $("page-"+name).classList.add("active");
+ document.querySelectorAll(".nav").forEach(b=>b.classList.toggle("active",b.dataset.page===name));
+ $("topTitle").textContent=pageTitles[name];
+ $("sidebar").classList.remove("open");
+ if(name==="library")renderNotes();
+ if(name==="home")updateStats();
+ window.scrollTo({top:0,behavior:"smooth"});
+}
+document.querySelectorAll(".nav").forEach(b=>b.addEventListener("click",()=>showPage(b.dataset.page)));
+$("menuBtn").addEventListener("click",()=>$("sidebar").classList.toggle("open"));
+document.querySelectorAll(".tab").forEach(b=>b.addEventListener("click",()=>{
+ document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("active",t===b));
+ document.querySelectorAll(".tab-panel").forEach(p=>p.classList.toggle("hidden",p.id!==b.dataset.tab));
+}));
+
+// Математический парсер без eval и Function.
+function tokenize(s){
+ s=s.replace(/π/g,"pi").replace(/×/g,"*").replace(/÷/g,"/");
+ const out=[];let i=0;
+ while(i<s.length){
+  if(/\s/.test(s[i])){i++;continue}
+  const num=s.slice(i).match(/^(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?/i);
+  if(num){out.push({t:"num",v:Number(num[0])});i+=num[0].length;continue}
+  const id=s.slice(i).match(/^[a-zA-Z_]+/);
+  if(id){out.push({t:"id",v:id[0].toLowerCase()});i+=id[0].length;continue}
+  if("+-*/^()%!".includes(s[i])){out.push({t:s[i]});i++;continue}
+  throw Error("Недопустимый символ: "+s[i]);
+ }
+ out.push({t:"eof"});return out;
+}
+function fact(n){
+ if(!Number.isInteger(n)||n<0||n>170)throw Error("Факториал принимает целое число от 0 до 170");
+ let r=1;for(let i=2;i<=n;i++)r*=i;return r;
+}
+function parseMath(source){
+ const ts=tokenize(source);let pos=0;
+ const peek=()=>ts[pos],take=()=>ts[pos++];
+ const expect=t=>{if(peek().t!==t)throw Error("Проверь скобки и выражение");return take()};
+ const constants={pi:Math.PI,e:Math.E};
+ const funcs={
+  sin:x=>Math.sin(x*Math.PI/180),cos:x=>Math.cos(x*Math.PI/180),
+  tan:x=>Math.tan(x*Math.PI/180),asin:x=>Math.asin(x)*180/Math.PI,
+  acos:x=>Math.acos(x)*180/Math.PI,atan:x=>Math.atan(x)*180/Math.PI,
+  sqrt:Math.sqrt,abs:Math.abs,ln:Math.log,log:Math.log10,
+  exp:Math.exp,floor:Math.floor,ceil:Math.ceil,round:Math.round
+ };
+ function atom(){
+  if(peek().t==="+"){take();return atom()}
+  if(peek().t==="-"){take();return -atom()}
+  if(peek().t==="num")return take().v;
+  if(peek().t==="("){take();const x=expr();expect(")");return x}
+  if(peek().t==="id"){
+   const name=take().v;
+   if(name==="pi"||name==="e")return constants[name];
+   if(name==="factorial"){expect("(");const x=expr();expect(")");return fact(x)}
+   if(!(name in funcs))throw Error("Неизвестная функция: "+name);
+   expect("(");const x=expr();expect(")");
+   const r=funcs[name](x);
+   if(Number.isNaN(r))throw Error("Функция не определена для этого значения");
+   return r;
+  }
+  throw Error("Проверь выражение");
+ }
+ function power(){let x=atom();if(peek().t==="^"){take();x=Math.pow(x,power())}return x}
+ function term(){
+  let x=power();
+  while(["*","/","%"].includes(peek().t)){
+   const op=take().t,y=power();
+   if((op==="/"||op==="%")&&y===0)throw Error("Деление на ноль");
+   x=op==="*"?x*y:op==="/"?x/y:x%y;
+  }return x;
+ }
+ function expr(){
+  let x=term();
+  while(["+","-"].includes(peek().t)){
+   const op=take().t,y=term();x=op==="+"?x+y:x-y;
+  }return x;
+ }
+ const result=expr();
+ if(peek().t==="!")throw Error("Для факториала используй factorial(5)");
+ if(peek().t!=="eof")throw Error("Лишние символы в выражении");
+ if(!Number.isFinite(result))throw Error("Результат не является конечным числом");
+ return result;
+}
+function calculate(){
+ try{$("calcResult").textContent="Результат: "+parseMath($("calcInput").value.replace(/,/g,"."))}
+ catch(e){$("calcResult").textContent="Ошибка: "+e.message}
+}
+$("calcInput").addEventListener("keydown",e=>{if(e.key==="Enter")calculate()});
+
+// Конвертер.
+const unitData={
+ length:{м:1,км:1000,см:.01,мм:.001,миля:1609.344,фут:.3048},
+ mass:{кг:1,г:.001,мг:.000001,т:1000,фунт:.45359237},
+ time:{с:1,мин:60,ч:3600,сутки:86400,мс:.001},
+ speed:{"м/с":1,"км/ч":1/3.6,"миль/ч":.44704},
+ area:{"м²":1,"км²":1e6,"см²":.0001,га:10000},
+ volume:{"м³":1,"л":.001,"мл":.000001,"см³":.000001},
+ energy:{Дж:1,"кДж":1000,кал:4.184,"ккал":4184,"кВт·ч":3600000},
+ pressure:{Па:1,"кПа":1000,бар:100000,атм:101325,"мм рт. ст.":133.322}
+};
+function updateUnits(){
+ const d=unitData[$("unitCategory").value];
+ ["unitFrom","unitTo"].forEach(id=>$(id).innerHTML=Object.keys(d).map(u=>`<option>${esc(u)}</option>`).join(""));
+ if($("unitTo").options.length>1)$("unitTo").selectedIndex=1;
+}
+function convertUnits(){
+ const val=Number($("unitValue").value),d=unitData[$("unitCategory").value];
+ if($("unitValue").value.trim()===""||!Number.isFinite(val))return $("unitResult").textContent="Введи корректное число.";
+ const r=val*d[$("unitFrom").value]/d[$("unitTo").value];
+ $("unitResult").textContent=`${val} ${$("unitFrom").value} = ${Number(r.toPrecision(12))} ${$("unitTo").value}`;
+}
+updateUnits();
+
+// Расчёт по математическим формулам.
+const templates={
+ circle:{labels:["Радиус r"],run:v=>Math.PI*v[0]**2+" — площадь круга"},
+ triangle:{labels:["Основание a","Высота h"],run:v=>v[0]*v[1]/2+" — площадь треугольника"},
+ pythagoras:{labels:["Катет a","Катет b"],run:v=>Math.sqrt(v[0]**2+v[1]**2)+" — гипотенуза"},
+ percent:{labels:["Число","Процент"],run:v=>v[0]*v[1]/100+" — процент от числа"},
+ quadratic:{labels:["Коэффициент a","Коэффициент b","Коэффициент c"],run:v=>{
+  if(v[0]===0)throw Error("Коэффициент a не должен быть нулём");
+  const d=v[1]**2-4*v[0]*v[2];
+  return d<0?`D = ${d}. Действительных корней нет.`:
+  `D = ${d}\nx₁ = ${(-v[1]+Math.sqrt(d))/(2*v[0])}\nx₂ = ${(-v[1]-Math.sqrt(d))/(2*v[0])}`;
+ }},
+ sphere:{labels:["Радиус r"],run:v=>4*Math.PI*v[0]**3/3+" — объём шара"}
+};
+function updateTemplate(){
+ const t=templates[$("mathTemplate").value];
+ $("templateFields").innerHTML=t.labels.map((l,i)=>`<div class="field"><label>${esc(l)}</label><input type="number" step="any" id="tf${i}" value="${i===0?3:i===1?4:1}"></div>`).join("");
+}
+function solveTemplate(){
+ try{
+  const t=templates[$("mathTemplate").value],v=t.labels.map((_,i)=>Number($("tf"+i).value));
+  if(v.some((x,i)=>$("tf"+i).value.trim()===""||!Number.isFinite(x)))throw Error("Заполни все поля");
+  $("templateResult").textContent=String(t.run(v));
+ }catch(e){$("templateResult").textContent="Ошибка: "+e.message}
+}
+updateTemplate();
+
+// Справочник физических формул.
+const physics={
+ kin:[
+  {name:"Скорость: v = s / t",fields:["Путь s (м)","Время t (с)"],unit:"м/с",desc:"Средняя скорость равна пути, делённому на время.",fn:v=>v[0]/v[1],check:v=>v[1]!==0},
+  {name:"Путь: s = v × t",fields:["Скорость v (м/с)","Время t (с)"],unit:"м",desc:"Путь при равномерном движении.",fn:v=>v[0]*v[1]},
+  {name:"Ускорение: a = (v − v₀) / t",fields:["Конечная скорость v","Начальная скорость v₀","Время t (с)"],unit:"м/с²",desc:"Среднее ускорение за промежуток времени.",fn:v=>(v[0]-v[1])/v[2],check:v=>v[2]!==0}
+ ],
+ dyn:[
+  {name:"Сила: F = m × a",fields:["Масса m (кг)","Ускорение a (м/с²)"],unit:"Н",desc:"Второй закон Ньютона.",fn:v=>v[0]*v[1]},
+  {name:"Импульс: p = m × v",fields:["Масса m (кг)","Скорость v (м/с)"],unit:"кг·м/с",desc:"Импульс тела.",fn:v=>v[0]*v[1]}
+ ],
+ elec:[
+  {name:"Закон Ома: I = U / R",fields:["Напряжение U (В)","Сопротивление R (Ом)"],unit:"А",desc:"Сила тока на участке цепи.",fn:v=>v[0]/v[1],check:v=>v[1]!==0},
+  {name:"Напряжение: U = I × R",fields:["Ток I (А)","Сопротивление R (Ом)"],unit:"В",desc:"Напряжение по закону Ома.",fn:v=>v[0]*v[1]},
+  {name:"Мощность: P = U × I",fields:["Напряжение U (В)","Ток I (А)"],unit:"Вт",desc:"Электрическая мощность.",fn:v=>v[0]*v[1]}
+ ],
+ energy:[
+  {name:"Работа: A = F × s",fields:["Сила F (Н)","Путь s (м)"],unit:"Дж",desc:"Работа силы при совпадении направления силы и перемещения.",fn:v=>v[0]*v[1]},
+  {name:"Кинетическая энергия: E = mv² / 2",fields:["Масса m (кг)","Скорость v (м/с)"],unit:"Дж",desc:"Кинетическая энергия тела.",fn:v=>v[0]*v[1]**2/2},
+  {name:"Потенциальная энергия: E = mgh",fields:["Масса m (кг)","Высота h (м)"],unit:"Дж",desc:"Используется g = 9,81 м/с².",fn:v=>v[0]*9.81*v[1]}
+ ],
+ density:[
+  {name:"Плотность: ρ = m / V",fields:["Масса m (кг)","Объём V (м³)"],unit:"кг/м³",desc:"Масса единицы объёма.",fn:v=>v[0]/v[1],check:v=>v[1]!==0},
+  {name:"Давление: p = F / S",fields:["Сила F (Н)","Площадь S (м²)"],unit:"Па",desc:"Сила на единицу площади.",fn:v=>v[0]/v[1],check:v=>v[1]!==0}
+ ],
+ thermo:[
+  {name:"Количество теплоты: Q = cmΔT",fields:["Теплоёмкость c","Масса m (кг)","Изменение температуры ΔT (°C)"],unit:"Дж",desc:"Без учёта фазового перехода.",fn:v=>v[0]*v[1]*v[2]}
+ ]
+};
+function updatePhysics(){
+ $("physicsFormula").innerHTML=physics[$("physicsCategory").value].map((f,i)=>`<option value="${i}">${esc(f.name)}</option>`).join("");
+ renderPhysicsFields();
+}
+function renderPhysicsFields(){
+ const f=physics[$("physicsCategory").value][Number($("physicsFormula").value)||0];
+ $("physicsFields").innerHTML=f.fields.map((name,i)=>`<div class="field"><label>${esc(name)}</label><input type="number" step="any" id="pf${i}" value="${i===0?10:i===1?2:1}"></div>`).join("");
+ $("physicsDescription").textContent=f.desc;
+}
+function solvePhysics(){
+ try{
+  const f=physics[$("physicsCategory").value][Number($("physicsFormula").value)||0];
+  const v=f.fields.map((_,i)=>Number($("pf"+i).value));
+  if(v.some((x,i)=>$("pf"+i).value.trim()===""||!Number.isFinite(x)))throw Error("Заполни все поля");
+  if(f.check&&!f.check(v))throw Error("Знаменатель не должен быть равен нулю");
+  const r=f.fn(v);if(!Number.isFinite(r))throw Error("Не удалось вычислить результат");
+  $("physicsResult").textContent=`Результат: ${Number(r.toPrecision(10))} ${f.unit}\nФормула: ${f.name}`;
+ }catch(e){$("physicsResult").textContent="Ошибка: "+e.message}
+}
+updatePhysics();
+
+function solveWordProblem(){
+ const s=$("problemInput").value.toLowerCase();
+ const nums=(s.match(/-?\d+(?:[.,]\d+)?/g)||[]).map(x=>Number(x.replace(",",".")));
+ if(nums.length<2)return $("problemResult").textContent="Укажи в условии хотя бы два числовых значения.";
+ if(/скорост|прош[её]л|проехал|путь/.test(s)&&/секунд|час|врем/.test(s)){
+  const dist=nums[0],time=nums[1];
+  if(time===0)return $("problemResult").textContent="Время не может быть равно нулю.";
+  $("problemResult").textContent=`Дано:\ns = ${dist}\nt = ${time}\n\nФормула: v = s / t\nПодстановка: v = ${dist} / ${time}\nОтвет: v = ${dist/time} в единицах пути за единицу времени.\n\nПроверь единицы измерения.`;
+ }else{
+  $("problemResult").textContent="Тип задачи не определён автоматически.\n\n1. Выпиши известные величины.\n2. Определи искомую величину.\n3. Выбери формулу из справочника выше.\n4. Подставь значения и единицы измерения.";
+ }
+}
+
+// Поиск статей.
+async function searchWiki(q,target){
+ const el=$(target);el.innerHTML='<div class="empty">Выполняется поиск...</div>';
+ try{
+  const url="https://ru.wikipedia.org/w/api.php?action=query&generator=search&gsrsearch="+encodeURIComponent(q)+"&gsrnamespace=0&gsrlimit=8&prop=extracts&exintro=1&explaintext=1&exsentences=3&format=json&origin=*";
+  const res=await fetch(url);if(!res.ok)throw Error("Ошибка источника");
+  const data=await res.json(),pages=Object.values(data.query?.pages||{}).sort((a,b)=>(a.index||0)-(b.index||0));
+  if(!pages.length){el.innerHTML='<div class="empty">Ничего не найдено. Измени запрос.</div>';return}
+  el.innerHTML="";
+  pages.forEach(p=>{
+   const div=document.createElement("div");div.className="list-item";
+   const tag=document.createElement("span");tag.className="badge";tag.textContent="Википедия";
+   const a=document.createElement("a");a.href="https://ru.wikipedia.org/?curid="+encodeURIComponent(p.pageid);
+   a.target="_blank";a.rel="noopener noreferrer";a.textContent=p.title;
+   const desc=document.createElement("p");desc.textContent=p.extract||"Открой статью для подробностей.";
+   div.append(tag,document.createElement("br"),a,desc);el.appendChild(div);
+  });
+ }catch(e){
+  el.innerHTML='<div class="empty">Не удалось выполнить поиск. Проверь подключение к интернету.<br><br><a href="https://ru.wikipedia.org/" target="_blank" rel="noopener noreferrer">Открыть Википедию</a></div>';
+ }
+}
+$("searchForm").addEventListener("submit",e=>{e.preventDefault();searchWiki($("searchInput").value.trim(),"searchResults")});
+function quickSearch(q){$("searchInput").value=q;searchWiki(q,"searchResults")}
+
+// Текстовые документы.
+let docs=readStore("docs",[]);
+$("documentFiles").addEventListener("change",async e=>{
+ for(const file of e.target.files){
+  if(file.size>2*1024*1024){alert(file.name+": файл больше 2 МБ.");continue}
+  try{docs.push({name:file.name,text:await file.text()})}
+  catch{alert("Не удалось прочитать "+file.name)}
+ }
+ writeStore("docs",docs);updateStats();
+ $("documentResults").textContent=`Добавлено документов: ${docs.length}.`;
+ e.target.value="";
+});
+function searchDocuments(){
+ const q=$("docQuery").value.trim().toLowerCase(),out=$("documentResults");out.innerHTML="";
+ if(!q)return out.textContent="Введи запрос для поиска.";
+ let count=0;
+ docs.forEach(d=>{
+  const idx=d.text.toLowerCase().indexOf(q);if(idx<0)return;
+  count++;
+  const div=document.createElement("div");div.className="list-item";
+  const title=document.createElement("strong");title.textContent=d.name;
+  const p=document.createElement("p");
+  p.textContent=(idx>0?"…":"")+d.text.slice(Math.max(0,idx-120),Math.min(d.text.length,idx+q.length+200))+(idx+q.length+200<d.text.length?"…":"");
+  div.append(title,p);out.appendChild(div);
+ });
+ if(!count)out.textContent="Совпадений не найдено.";
+}
+function clearDocs(){
+ if(!confirm("Удалить все документы из списка?"))return;
+ docs=[];writeStore("docs",docs);updateStats();$("documentResults").textContent="";
+}
+
+// Личная библиотека.
+let notes=readStore("notes",[]);
+function saveNote(){
+ const title=$("noteTitle").value.trim(),text=$("noteText").value.trim();
+ if(!title||!text)return alert("Заполни название и содержание заметки.");
+ notes.unshift({id:Date.now(),title,text,date:new Date().toLocaleDateString("ru-RU")});
+ writeStore("notes",notes);$("noteTitle").value="";$("noteText").value="";
+ renderNotes();updateStats();
+}
+function renderNotes(){
+ const q=($("libraryQuery").value||"").toLowerCase(),el=$("notesList");el.innerHTML="";
+ const filtered=notes.filter(n=>(n.title+" "+n.text).toLowerCase().includes(q));
+ if(!filtered.length){el.innerHTML='<div class="empty">Заметок пока нет.</div>';return}
+ filtered.forEach(n=>{
+  const div=document.createElement("div");div.className="list-item";
+  const row=document.createElement("div");row.className="row between";
+  const title=document.createElement("strong");title.textContent=n.title;
+  const del=document.createElement("button");del.className="btn small danger";del.textContent="Удалить";
+  del.onclick=()=>{notes=notes.filter(x=>x.id!==n.id);writeStore("notes",notes);renderNotes();updateStats()};
+  row.append(title,del);
+  const text=document.createElement("p");text.textContent=n.text;
+  const date=document.createElement("p");date.textContent=n.date;
+  div.append(row,text,date);el.appendChild(div);
+ });
+}
+
+// Создание HTML-отчёта для открытия в Word.
+function gostData(){
+ const get=id=>$(id).value.trim();
+ return {institution:get("gInstitution"),department:get("gDepartment"),subject:get("gSubject"),topic:get("gTopic"),
+ student:get("gStudent"),group:get("gGroup"),teacher:get("gTeacher"),city:get("gCity"),
+ year:get("gYear")||String(new Date().getFullYear()),body:get("gBody")};
+}
+function makeGost(){
+ const d=gostData();
+ if(!d.institution||!d.subject||!d.topic||!d.student)throw Error("Заполни учебное заведение, дисциплину, тему и ФИО студента.");
+ return `<!DOCTYPE html><html lang="ru"><head><meta charset="UTF-8"><title>${esc(d.topic)}</title>
+ <style>@page{size:A4;margin:20mm 15mm 20mm 30mm}
+ body{font-family:"Times New Roman",serif;font-size:14pt;line-height:1.5;color:#000}
+ .titlepage{height:255mm;display:flex;flex-direction:column;text-align:center}
+ .institution{font-weight:bold;text-transform:uppercase}
+ .work{margin-top:35mm}.author{margin-top:20mm;text-align:right}
+ .bottom{margin-top:auto;margin-bottom:5mm}
+ h1{text-align:center;font-size:14pt;text-transform:uppercase}
+ p{text-align:justify;text-indent:1.25cm}
+ </style></head><body>
+ <div class="titlepage">
+ <div class="institution">${esc(d.institution)}<br>${esc(d.department)}</div>
+ <div class="work">${esc(d.subject)}<h2>${esc(d.topic)}</h2></div>
+ <div class="author">Выполнил(а): ${esc(d.student)}<br>Группа: ${esc(d.group||"________________")}<br>Проверил(а): ${esc(d.teacher||"________________")}</div>
+ <div class="bottom">${esc(d.city)}<br>${esc(d.year)}</div></div>
+ <h1>Введение</h1><p>${esc(d.body||"Укажи актуальность темы, цель и задачи работы.")}</p>
+ <h1>Основная часть</h1><p>Изложи теоретические положения, методику выполнения работы и полученные результаты.</p>
+ <h1>Заключение</h1><p>Сформулируй основные результаты и выводы по поставленным задачам.</p>
+ <h1>Список использованных источников</h1><p>1. Укажи использованные учебники, статьи и электронные ресурсы.</p>
+ </body></html>`;
+}
+function previewGost(){
+ try{makeGost();$("gostPreview").textContent="Документ подготовлен. Нажми «Скачать для Word», чтобы сохранить файл."}
+ catch(e){$("gostPreview").textContent="Ошибка: "+e.message}
+}
+function downloadFile(name,content,type){
+ const blob=new Blob(["\ufeff",content],{type});
+ const url=URL.createObjectURL(blob),a=document.createElement("a");
+ a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
+}
+function downloadGost(){
+ try{downloadFile("МосНейро_отчет.html",makeGost(),"text/html;charset=utf-8")}
+ catch(e){alert(e.message)}
+}
+
+// Резервная копия и обслуживание данных.
+function updateStats(){
+ $("statNotes").textContent=notes.length;
+ $("statDocs").textContent=docs.length;
+}
+function exportBackup(){
+ downloadFile("МосНейро_резервная_копия.json",
+  JSON.stringify({project:"МосНейро",version:"1.1",notes,docs,exportedAt:new Date().toISOString()},null,2),
+  "application/json;charset=utf-8");
+}
+function clearAllData(){
+ if(!confirm("Удалить все заметки и добавленные документы? Это действие нельзя отменить."))return;
+ ["notes","docs"].forEach(k=>localStorage.removeItem("mosneiro_"+k));
+ notes=[];docs=[];renderNotes();updateStats();
+ $("documentResults").textContent="";
+ alert("Сохранённые данные удалены.");
+}
+$("today").textContent=new Date().toLocaleDateString("ru-RU",{day:"2-digit",month:"2-digit",year:"numeric"});
+updateStats();
+</script>
+</body>
+</html>
